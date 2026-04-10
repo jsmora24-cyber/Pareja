@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pareja Dashboard - Gestión de Relación</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/sections.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- TOP NAVIGATION HEADER -->
+        <header class="top-nav">
+            <div class="nav-container">
+                <h1 class="app-title">💑 Pareja Dashboard</h1>
+                <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+                
+                <nav class="nav-menu">
+                    <button class="nav-btn nav-btn--active" data-section="proyectos">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Proyectos</span>
+                    </button>
+                    <button class="nav-btn" data-section="ahorros">
+                        <span class="nav-icon">💰</span>
+                        <span class="nav-label">Ahorros</span>
+                    </button>
+                    <button class="nav-btn" data-section="retos">
+                        <span class="nav-icon">🏆</span>
+                        <span class="nav-label">Retos</span>
+                    </button>
+                    <button class="nav-btn" data-section="experiencias">
+                        <span class="nav-icon">🌍</span>
+                        <span class="nav-label">Experiencias</span>
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- HEADER -->
+            <header class="header">
+                <h2 class="header-title">Bienvenidos a su Dashboard</h2>
+                <p class="header-subtitle">Gestiona tu relación, sueños y recuerdos juntos</p>
+            </header>
+
+            <!-- CONTENT WRAPPER -->
+            <div class="content-wrapper">
+                
+                <!-- SECCIÓN: PROYECTOS -->
+                <section id="proyectos" class="section section--active">
+                    <div class="section-header">
+                        <h3 class="section-title">Proyectos Compartidos</h3>
+                        <button class="btn btn--primary" id="btn-nuevo-proyecto">
+                            + Nuevo Proyecto
+                        </button>
+                    </div>
+
+                    <!-- Form para crear/editar proyecto (oculto por defecto) -->
+                    <div class="form-modal form-modal--proyectos" id="form-proyecto-modal">
+                        <div class="form-modal-content">
+                            <div class="form-header">
+                                <h4 class="form-title">Nuevo Proyecto</h4>
+                                <button class="btn-close" id="close-form-proyecto">&times;</button>
+                            </div>
+                            <form id="form-proyecto" class="form">
+                                <div class="form-group">
+                                    <label for="proyecto-nombre">Nombre del Proyecto</label>
+                                    <input type="text" id="proyecto-nombre" placeholder="Ej: Viaje a Japón" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="proyecto-descripcion">Descripción</label>
+                                    <textarea id="proyecto-descripcion" placeholder="Describe tu proyecto..." rows="3"></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="proyecto-fecha">Fecha Objetivo</label>
+                                        <input type="date" id="proyecto-fecha" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="proyecto-estado">Estado</label>
+                                        <select id="proyecto-estado">
+                                            <option value="pendiente">Pendiente</option>
+                                            <option value="en-progreso">En Progreso</option>
+                                            <option value="completado">Completado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn--primary">Guardar Proyecto</button>
+                                    <button type="button" class="btn btn--secondary" id="cancel-form-proyecto">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor de proyectos -->
+                    <div id="proyectos-container" class="cards-grid">
+                        <!-- Los proyectos se renderizarán aquí -->
+                    </div>
+                </section>
+
+                <!-- SECCIÓN: AHORROS -->
+                <section id="ahorros" class="section">
+                    <div class="section-header">
+                        <h3 class="section-title">Gestión de Ahorros</h3>
+                        <button class="btn btn--primary" id="btn-nuevo-ahorro">
+                            + Registrar Ahorro
+                        </button>
+                    </div>
+
+                    <!-- Resumen de totales -->
+                    <div class="ahorros-summary">
+                        <div class="summary-card">
+                            <div class="summary-label">Total Ahorrado</div>
+                            <div class="summary-amount" id="total-ahorros">$0.00</div>
+                        </div>
+                        <div class="summary-cards-grid" id="resumen-por-tipo">
+                            <!-- Los totales por tipo se renderizarán aquí -->
+                        </div>
+                    </div>
+
+                    <!-- Form para registrar ahorro -->
+                    <div class="form-modal form-modal--ahorros" id="form-ahorro-modal">
+                        <div class="form-modal-content">
+                            <div class="form-header">
+                                <h4 class="form-title">Registrar Ahorro</h4>
+                                <button class="btn-close" id="close-form-ahorro">&times;</button>
+                            </div>
+                            <form id="form-ahorro" class="form">
+                                <div class="form-group">
+                                    <label for="ahorro-tipo">Tipo de Ahorro</label>
+                                    <select id="ahorro-tipo" required>
+                                        <option value="">Selecciona un tipo</option>
+                                        <option value="viaje">Viaje</option>
+                                        <option value="casa">Casa</option>
+                                        <option value="inversion">Inversión</option>
+                                        <option value="otro">Otro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ahorro-origen">Origen del Dinero</label>
+                                    <input type="text" id="ahorro-origen" placeholder="Ej: Bonificación, Salario..." required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="ahorro-cantidad">Cantidad</label>
+                                        <input type="number" id="ahorro-cantidad" placeholder="0.00" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="ahorro-moneda">Moneda</label>
+                                        <select id="ahorro-moneda">
+                                            <option value="USD">USD</option>
+                                            <option value="EUR">EUR</option>
+                                            <option value="MXN">MXN</option>
+                                            <option value="ARS">ARS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn--primary">Registrar Ahorro</button>
+                                    <button type="button" class="btn btn--secondary" id="cancel-form-ahorro">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Lista de ahorros -->
+                    <div class="ahorros-list" id="ahorros-container">
+                        <!-- Los ahorros se renderizarán aquí -->
+                    </div>
+                </section>
+
+                <!-- SECCIÓN: RETOS -->
+                <section id="retos" class="section">
+                    <div class="section-header">
+                        <h3 class="section-title">Retos de Pareja</h3>
+                        <button class="btn btn--primary" id="btn-nuevo-reto">
+                            + Nuevo Reto
+                        </button>
+                    </div>
+
+                    <!-- Regla del Reto -->
+                    <div class="reto-rule" id="reto-rule-box">
+                        <button class="reto-rule-close" id="reto-rule-close" aria-label="Ocultar regla">×</button>
+                        <h4>📜 Regla del Reto</h4>
+                        <div class="rule-content">
+                            <p>✅ Si ambos cumplen → <strong>Reto Logrado 🎉</strong></p>
+                            <p>⚡ Si uno cumple y otro no → <strong>Recompensa: Proteína + Cena</strong></p>
+                            <p>❌ Si ninguno cumple → Sigan intentando 💪</p>
+                        </div>
+                    </div>
+
+                    <!-- Form para crear reto -->
+                    <div class="form-modal form-modal--retos" id="form-reto-modal">
+                        <div class="form-modal-content">
+                            <div class="form-header">
+                                <h4 class="form-title" id="reto-form-title">Nuevo Reto</h4>
+                                <button class="btn-close" id="close-form-reto">&times;</button>
+                            </div>
+                            <form id="form-reto" class="form">
+                                <div class="form-group">
+                                    <label for="reto-usuario">Para quién es el reto?</label>
+                                    <select id="reto-usuario" required>
+                                        <option value="">Selecciona usuario</option>
+                                        <option value="Camila Ruiz">Camila Ruiz</option>
+                                        <option value="Sebastian Mora">Sebastian Mora</option>
+                                        <option value="Ambos">Ambos</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reto-nombre">Nombre del reto</label>
+                                    <input type="text" id="reto-nombre" placeholder="Ej: Entrenamiento semanal" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reto-descripcion">Descripción del Reto</label>
+                                    <input type="text" id="reto-descripcion" placeholder="Ej: Hacer ejercicio 3 veces esta semana" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="reto-fecha-inicio">Fecha de inicio</label>
+                                        <input type="date" id="reto-fecha-inicio" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="reto-fecha-fin">Fecha de fin</label>
+                                        <input type="date" id="reto-fecha-fin" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Días en que se va a hacer</label>
+                                    <div class="reto-dias-selector" id="reto-dias-selector">
+                                        <label class="checkbox"><input type="checkbox" value="1"> <span>Lun</span></label>
+                                        <label class="checkbox"><input type="checkbox" value="2"> <span>Mar</span></label>
+                                        <label class="checkbox"><input type="checkbox" value="3"> <span>Mié</span></label>
+                                        <label class="checkbox"><input type="checkbox" value="4"> <span>Jue</span></label>
+                                        <label class="checkbox"><input type="checkbox" value="5"> <span>Vie</span></label>
+                                        <label class="checkbox"><input type="checkbox" value="6"> <span>Sáb</span></label>
+                                        <label class="checkbox"><input type="checkbox" value="0"> <span>Dom</span></label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="reto-variable">Variable a medir (opcional)</label>
+                                    <input type="text" id="reto-variable" placeholder="Ej: Minutos, páginas, km, vasos de agua">
+                                </div>
+                                <div class="form-group">
+                                    <label for="reto-objetivo-diario">Objetivo diario (opcional)</label>
+                                    <textarea id="reto-objetivo-diario" placeholder="Ej: Completar 30 minutos cada día programado" rows="3"></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn--primary" id="reto-submit-btn">Crear Reto</button>
+                                    <button type="button" class="btn btn--secondary" id="cancel-form-reto">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor de retos (dos columnas) -->
+                    <div id="retos-container" class="retos-grid">
+                        <!-- Los retos se renderizarán aquí -->
+                    </div>
+
+                    <!-- Indicador de recompensa -->
+                    <div id="recompensa-container" class="recompensa-card" style="display: none;">
+                        <!-- La recompensa se mostrará aquí -->
+                    </div>
+                </section>
+
+                <!-- SECCIÓN: EXPERIENCIAS -->
+                <section id="experiencias" class="section">
+                    <div class="section-header">
+                        <h3 class="section-title">Recuerdos y Experiencias</h3>
+                        <button class="btn btn--primary" id="btn-nueva-experiencia">
+                            + Agregar Experiencia
+                        </button>
+                    </div>
+
+                    <div class="experiencias-split-layout">
+                        <!-- Mapa interactivo -->
+                        <div class="mapa-interactive-wrapper">
+                            <h4>Haz clic en un país para ver las fotos</h4>
+                            <div id="world-map" class="world-map-interactive">
+                                <!-- El mapa SVG se cargará aquí -->
+                            </div>
+                            <div id="pais-seleccionado-info" class="pais-info" style="display: none;">
+                                <span id="pais-nombre"></span>
+                                <button id="cerrar-pais" class="btn-close">×</button>
+                            </div>
+                        </div>
+
+                        <!-- Galería de fotos tipo Instagram -->
+                        <div class="galeria-experiencias">
+                            <h4 id="galeria-titulo">Gallery</h4>
+                            <div id="experiencias-container" class="experiencias-gallery-grid">
+                                <!-- Las experiencias se renderizarán aquí -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form para agregar experiencia -->
+                    <div class="form-modal form-modal--experiencias" id="form-experiencia-modal">
+                        <div class="form-modal-content">
+                            <div class="form-header">
+                                <h4 class="form-title">Nueva Experiencia</h4>
+                                <button class="btn-close" id="close-form-experiencia">&times;</button>
+                            </div>
+                            <form id="form-experiencia" class="form">
+                                <div class="form-group">
+                                    <label for="exp-pais">País</label>
+                                    <select id="exp-pais" required>
+                                        <option value="">Selecciona un país</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exp-ciudad">Ciudad</label>
+                                    <input type="text" id="exp-ciudad" placeholder="Ej: Tokio" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exp-descripcion">Descripción</label>
+                                    <textarea id="exp-descripcion" placeholder="Cuenta lo que sucedió..." rows="3"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exp-imagen-file">Imagen desde tu computador</label>
+                                    <input type="file" id="exp-imagen-file" accept="image/*">
+                                    <small id="exp-upload-status">Puedes subir archivo o pegar una URL.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exp-imagen">Imagen (URL opcional)</label>
+                                    <input type="url" id="exp-imagen" placeholder="https://ejemplo.com/imagen.jpg">
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn--primary">Guardar Experiencia</button>
+                                    <button type="button" class="btn btn--secondary" id="cancel-form-experiencia">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Visor de imagen grande -->
+                    <div class="form-modal" id="experiencia-lightbox">
+                        <div class="experiencia-lightbox-content">
+                            <button class="btn-close experiencia-lightbox-close" id="experiencia-lightbox-close">&times;</button>
+                            <img id="experiencia-lightbox-image" class="experiencia-lightbox-image" alt="Vista de experiencia">
+                            <p id="experiencia-lightbox-caption" class="experiencia-lightbox-caption"></p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- NOTIFICATION CONTAINER -->
+    <div id="notifications" class="notifications-container"></div>
+
+    <!-- MAPA MUNDIAL REAL -->
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world-merc.js"></script>
+
+    <!-- SCRIPTS -->
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/proyectos.js"></script>
+    <script src="js/ahorros.js"></script>
+    <script src="js/retos.js"></script>
+    <script src="js/experiencias.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
