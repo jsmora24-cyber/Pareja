@@ -112,9 +112,33 @@ function inicializarApp() {
             navMenu?.classList.remove('nav-menu--open');
         }
     });
+
+    // Sincronización manual entre dispositivos (exportar/importar JSON)
+    const btnExportar = document.getElementById('btn-exportar-datos');
+    const btnImportar = document.getElementById('btn-importar-datos');
+    const inputImportar = document.getElementById('input-importar-datos');
+
+    if (btnExportar) {
+        btnExportar.addEventListener('click', () => {
+            exportarDatos();
+        });
+    }
+
+    if (btnImportar && inputImportar) {
+        btnImportar.addEventListener('click', () => {
+            inputImportar.click();
+        });
+
+        inputImportar.addEventListener('change', (e) => {
+            const archivo = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+            if (!archivo) return;
+            importarDatos(archivo);
+            inputImportar.value = '';
+        });
+    }
     
     // Mensaje de bienvenida
-    mostrarNotificacion('¡Bienvenidos a su Dashboard de Pareja! 💑', 'info', 5000);
+    mostrarNotificacion('¡Bienvenidos! Usa Exportar/Importar para sincronizar entre dispositivos.', 'info', 5000);
 }
 
 /**

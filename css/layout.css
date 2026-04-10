@@ -111,6 +111,20 @@
     margin-bottom: var(--spacing-xl);
 }
 
+.header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+}
+
+.header-sync-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .header-title {
     font-size: var(--font-size-2xl);
     margin-bottom: var(--spacing-sm);
@@ -163,6 +177,19 @@
 
     .header-title {
         font-size: var(--font-size-xl);
+    }
+
+    .header-top-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header-sync-actions {
+        width: 100%;
+    }
+
+    .header-sync-actions .btn {
+        flex: 1;
     }
 
     .content-wrapper {

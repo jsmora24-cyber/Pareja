@@ -47,8 +47,17 @@
         <main class="main-content">
             <!-- HEADER -->
             <header class="header">
-                <h2 class="header-title">Bienvenidos a su Dashboard</h2>
-                <p class="header-subtitle">Gestiona tu relación, sueños y recuerdos juntos</p>
+                <div class="header-top-row">
+                    <div>
+                        <h2 class="header-title">Bienvenidos a su Dashboard</h2>
+                        <p class="header-subtitle">Gestiona tu relación, sueños y recuerdos juntos</p>
+                    </div>
+                    <div class="header-sync-actions">
+                        <button id="btn-exportar-datos" class="btn btn--secondary btn--small">Exportar Datos</button>
+                        <button id="btn-importar-datos" class="btn btn--secondary btn--small">Importar Datos</button>
+                        <input type="file" id="input-importar-datos" accept="application/json" style="display:none;">
+                    </div>
+                </div>
             </header>
 
             <!-- CONTENT WRAPPER -->
