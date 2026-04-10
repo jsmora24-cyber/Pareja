@@ -3,6 +3,14 @@
    ========================================== */
 
 const STORAGE_KEY = 'pareja_app';
+const FIREBASE_CONFIG_KEY = 'pareja_firebase_config';
+const FIREBASE_ROOM_KEY = 'pareja_firebase_room';
+
+let firebaseDb = null;
+let firebaseDocRef = null;
+let firebaseUnsubscribe = null;
+let firebaseSincronizandoRemoto = false;
+let firebasePushTimer = null;
 
 // Estructura inicial de datos
 const ESTRUCTURA_INICIAL = {
@@ -11,6 +19,120 @@ const ESTRUCTURA_INICIAL = {
     retos: [],
     experiencias: []
 };
+
+function obtenerPreferenciasFirebase() {
+    let config = null;
+    let roomId = '';
+
+    try {
+        const rawConfig = localStorage.getItem(FIREBASE_CONFIG_KEY);
+        config = rawConfig ? JSON.parse(rawConfig) : null;
+    } catch (error) {
+        config = null;
+    }
+
+    try {
+        roomId = localStorage.getItem(FIREBASE_ROOM_KEY) || '';
+    } catch (error) {
+        roomId = '';
+    }
+
+    return { config, roomId };
+}
+
+function guardarPreferenciasFirebase(config, roomId) {
+    localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(config));
+    localStorage.setItem(FIREBASE_ROOM_KEY, roomId);
+}
+
+function firebaseDisponible() {
+    return typeof firebase !== 'undefined' && typeof firebase.firestore === 'function';
+}
+
+function programarPushFirebase() {
+    if (!firebaseDocRef || firebaseSincronizandoRemoto) {
+        return;
+    }
+
+    clearTimeout(firebasePushTimer);
+    firebasePushTimer = setTimeout(() => {
+        forzarSyncFirebaseAhora();
+    }, 400);
+}
+
+async function forzarSyncFirebaseAhora() {
+    if (!firebaseDocRef || firebaseSincronizandoRemoto) {
+        return false;
+    }
+
+    try {
+        const datos = obtenerTodosDatos();
+        await firebaseDocRef.set({
+            datos,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true });
+        return true;
+    } catch (error) {
+        console.error('Error al sincronizar con Firebase:', error);
+        return false;
+    }
+}
+
+async function inicializarFirebaseSync(configInput, roomIdInput) {
+    const pref = obtenerPreferenciasFirebase();
+    const config = configInput || pref.config;
+    const roomId = (roomIdInput || pref.roomId || '').trim();
+
+    if (!config || !roomId) {
+        return { ok: false, message: 'Falta configurar Firebase o ID de sala.' };
+    }
+
+    if (!firebaseDisponible()) {
+        return { ok: false, message: 'Firebase SDK no está disponible en esta página.' };
+    }
+
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(config);
+        }
+
+        firebaseDb = firebase.firestore();
+        firebaseDocRef = firebaseDb.collection('parejaRealtime').doc(roomId);
+
+        if (firebaseUnsubscribe) {
+            firebaseUnsubscribe();
+        }
+
+        firebaseUnsubscribe = firebaseDocRef.onSnapshot((snapshot) => {
+            const remoto = snapshot.exists ? snapshot.data()?.datos : null;
+            if (!remoto) {
+                return;
+            }
+
+            const local = obtenerTodosDatos();
+            if (JSON.stringify(remoto) === JSON.stringify(local)) {
+                return;
+            }
+
+            firebaseSincronizandoRemoto = true;
+            guardarTodosDatos(remoto, { skipRemote: true });
+            firebaseSincronizandoRemoto = false;
+
+            if (typeof renderizarSeccion === 'function') {
+                const activa = document.querySelector('.section--active')?.id || 'proyectos';
+                renderizarSeccion(activa);
+            }
+            mostrarNotificacion('Cambios sincronizados desde Firebase', 'info', 2500);
+        });
+
+        guardarPreferenciasFirebase(config, roomId);
+        await forzarSyncFirebaseAhora();
+        return { ok: true };
+    } catch (error) {
+        console.error('No se pudo iniciar Firebase sync:', error);
+        return { ok: false, message: 'No se pudo conectar con Firebase. Revisa la configuración.' };
+    }
+}
 
 /**
  * Obtiene todos los datos del localStorage
@@ -30,9 +152,13 @@ function obtenerTodosDatos() {
  * Guarda los datos completos en localStorage
  * @param {Object} datos - Datos a guardar
  */
-function guardarTodosDatos(datos) {
+function guardarTodosDatos(datos, opciones = {}) {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
+
+        if (!opciones.skipRemote) {
+            programarPushFirebase();
+        }
         return true;
     } catch (error) {
         console.error('Error al guardar datos:', error);

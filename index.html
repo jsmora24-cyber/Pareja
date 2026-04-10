@@ -40,6 +40,7 @@
                         <span class="nav-label">Experiencias</span>
                     </button>
                 </nav>
+                <button class="btn btn--secondary btn--small" id="btn-sync-firebase">Sync Firebase</button>
             </div>
         </header>
 
@@ -47,17 +48,8 @@
         <main class="main-content">
             <!-- HEADER -->
             <header class="header">
-                <div class="header-top-row">
-                    <div>
-                        <h2 class="header-title">Bienvenidos a su Dashboard</h2>
-                        <p class="header-subtitle">Gestiona tu relación, sueños y recuerdos juntos</p>
-                    </div>
-                    <div class="header-sync-actions">
-                        <button id="btn-exportar-datos" class="btn btn--secondary btn--small">Exportar Datos</button>
-                        <button id="btn-importar-datos" class="btn btn--secondary btn--small">Importar Datos</button>
-                        <input type="file" id="input-importar-datos" accept="application/json" style="display:none;">
-                    </div>
-                </div>
+                <h2 class="header-title">Bienvenidos a su Dashboard</h2>
+                <p class="header-subtitle">Gestiona tu relación, sueños y recuerdos juntos</p>
             </header>
 
             <!-- CONTENT WRAPPER -->
@@ -368,9 +360,63 @@
     <!-- NOTIFICATION CONTAINER -->
     <div id="notifications" class="notifications-container"></div>
 
+    <!-- MODAL CONFIG FIREBASE -->
+    <div class="form-modal" id="firebase-sync-modal">
+        <div class="form-modal-content">
+            <div class="form-header">
+                <h4 class="form-title">Sincronización en Tiempo Real (Firebase)</h4>
+                <button class="btn-close" id="close-firebase-sync-modal">&times;</button>
+            </div>
+            <form id="firebase-sync-form" class="form">
+                <div class="form-group">
+                    <label for="firebase-room-id">ID de pareja/sala</label>
+                    <input type="text" id="firebase-room-id" placeholder="Ej: cami-sebas-2026" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firebase-api-key">API Key</label>
+                        <input type="text" id="firebase-api-key" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firebase-auth-domain">Auth Domain</label>
+                        <input type="text" id="firebase-auth-domain" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firebase-project-id">Project ID</label>
+                        <input type="text" id="firebase-project-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firebase-storage-bucket">Storage Bucket</label>
+                        <input type="text" id="firebase-storage-bucket" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firebase-messaging-sender-id">Messaging Sender ID</label>
+                        <input type="text" id="firebase-messaging-sender-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firebase-app-id">App ID</label>
+                        <input type="text" id="firebase-app-id" required>
+                    </div>
+                </div>
+                <p id="firebase-sync-status" class="header-subtitle" style="margin: 0;">Configura Firebase una vez y quedará guardado en este navegador.</p>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn--primary">Conectar Firebase</button>
+                    <button type="button" class="btn btn--secondary" id="firebase-force-sync">Sincronizar Ahora</button>
+                    <button type="button" class="btn btn--secondary" id="cancel-firebase-sync-modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MAPA MUNDIAL REAL -->
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world-merc.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
     <!-- SCRIPTS -->
     <script src="js/utils.js"></script>

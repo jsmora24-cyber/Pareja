@@ -113,32 +113,86 @@ function inicializarApp() {
         }
     });
 
-    // Sincronización manual entre dispositivos (exportar/importar JSON)
-    const btnExportar = document.getElementById('btn-exportar-datos');
-    const btnImportar = document.getElementById('btn-importar-datos');
-    const inputImportar = document.getElementById('input-importar-datos');
-
-    if (btnExportar) {
-        btnExportar.addEventListener('click', () => {
-            exportarDatos();
-        });
-    }
-
-    if (btnImportar && inputImportar) {
-        btnImportar.addEventListener('click', () => {
-            inputImportar.click();
-        });
-
-        inputImportar.addEventListener('change', (e) => {
-            const archivo = e.target.files && e.target.files[0] ? e.target.files[0] : null;
-            if (!archivo) return;
-            importarDatos(archivo);
-            inputImportar.value = '';
-        });
-    }
+    inicializarControlesFirebase();
+    inicializarFirebaseSync();
     
     // Mensaje de bienvenida
-    mostrarNotificacion('¡Bienvenidos! Usa Exportar/Importar para sincronizar entre dispositivos.', 'info', 5000);
+    mostrarNotificacion('¡Bienvenidos a su Dashboard de Pareja! 💑', 'info', 5000);
+}
+
+function inicializarControlesFirebase() {
+    const btnSync = document.getElementById('btn-sync-firebase');
+    const modal = document.getElementById('firebase-sync-modal');
+    const closeBtn = document.getElementById('close-firebase-sync-modal');
+    const cancelBtn = document.getElementById('cancel-firebase-sync-modal');
+    const forceSyncBtn = document.getElementById('firebase-force-sync');
+    const form = document.getElementById('firebase-sync-form');
+    const status = document.getElementById('firebase-sync-status');
+
+    if (!modal || !form) return;
+
+    const pref = obtenerPreferenciasFirebase();
+    if (pref.config) {
+        document.getElementById('firebase-api-key').value = pref.config.apiKey || '';
+        document.getElementById('firebase-auth-domain').value = pref.config.authDomain || '';
+        document.getElementById('firebase-project-id').value = pref.config.projectId || '';
+        document.getElementById('firebase-storage-bucket').value = pref.config.storageBucket || '';
+        document.getElementById('firebase-messaging-sender-id').value = pref.config.messagingSenderId || '';
+        document.getElementById('firebase-app-id').value = pref.config.appId || '';
+    }
+    if (pref.roomId) {
+        document.getElementById('firebase-room-id').value = pref.roomId;
+    }
+
+    if (btnSync) {
+        btnSync.addEventListener('click', () => {
+            modal.classList.add('form-modal--active');
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => modal.classList.remove('form-modal--active'));
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => modal.classList.remove('form-modal--active'));
+    }
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('form-modal--active');
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const config = {
+            apiKey: document.getElementById('firebase-api-key').value.trim(),
+            authDomain: document.getElementById('firebase-auth-domain').value.trim(),
+            projectId: document.getElementById('firebase-project-id').value.trim(),
+            storageBucket: document.getElementById('firebase-storage-bucket').value.trim(),
+            messagingSenderId: document.getElementById('firebase-messaging-sender-id').value.trim(),
+            appId: document.getElementById('firebase-app-id').value.trim(),
+        };
+        const roomId = document.getElementById('firebase-room-id').value.trim();
+
+        const result = await inicializarFirebaseSync(config, roomId);
+        if (result.ok) {
+            status.textContent = `Conectado a Firebase en sala: ${roomId}`;
+            mostrarNotificacion('Sincronización en tiempo real activada', 'success');
+            modal.classList.remove('form-modal--active');
+        } else {
+            status.textContent = result.message || 'No se pudo conectar a Firebase.';
+            mostrarNotificacion(status.textContent, 'error');
+        }
+    });
+
+    if (forceSyncBtn) {
+        forceSyncBtn.addEventListener('click', async () => {
+            const ok = await forzarSyncFirebaseAhora();
+            mostrarNotificacion(ok ? 'Sincronización enviada a Firebase' : 'No se pudo sincronizar', ok ? 'success' : 'error');
+        });
+    }
 }
 
 /**
