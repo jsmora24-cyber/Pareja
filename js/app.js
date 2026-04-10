@@ -66,9 +66,6 @@ function renderizarSeccion(nombreSeccion) {
  * Inicializa la aplicación
  */
 function inicializarApp() {
-    // Inicializar datos de ejemplo si es primera vez
-    inicializarDatosEjemplo();
-    
     // Cargar sección inicial
     cambiarSeccion('proyectos');
     
