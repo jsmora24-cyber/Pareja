@@ -98,8 +98,8 @@ function solicitarConfirmacion(mensaje) {
  * @param {string} moneda - Código de moneda (USD, EUR, etc)
  * @returns {string} Monto formateado
  */
-function formatearMoneda(monto, moneda = 'USD') {
-    const formateador = new Intl.NumberFormat('es-ES', {
+function formatearMoneda(monto, moneda = 'COP') {
+    const formateador = new Intl.NumberFormat('es-CO', {
         style: 'currency',
         currency: moneda,
     });

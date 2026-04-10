@@ -19,7 +19,7 @@ function renderResumenAhorros() {
     const total = calcularTotalAhorros();
     
     // Actualizar total general
-    document.getElementById('total-ahorros').textContent = formatearMoneda(total, ahorros[0]?.moneda || 'USD');
+    document.getElementById('total-ahorros').textContent = formatearMoneda(total, ahorros[0]?.moneda || 'COP');
     
     // Ahorros por tipo
     const porTipo = obtenerAhorrosPorTipo();
@@ -35,7 +35,7 @@ function renderResumenAhorros() {
         return `
             <div class="summary-by-type" style="border-left: 4px solid ${info.color};">
                 <div class="summary-by-type-label">${info.emoji} ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}</div>
-                <div class="summary-by-type-amount">${formatearMoneda(monto, ahorros[0]?.moneda || 'USD')}</div>
+                <div class="summary-by-type-amount">${formatearMoneda(monto, ahorros[0]?.moneda || 'COP')}</div>
             </div>
         `;
     }).join('');
