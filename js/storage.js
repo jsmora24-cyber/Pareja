@@ -6,6 +6,17 @@ const STORAGE_KEY = 'pareja_app';
 const FIREBASE_CONFIG_KEY = 'pareja_firebase_config';
 const FIREBASE_ROOM_KEY = 'pareja_firebase_room';
 
+// Configuración por defecto de Firebase (autoconexión inicial)
+const DEFAULT_FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyC3l5Ogz-saQ9q4Ze_ybeIqu5dBrNIjR14',
+    authDomain: 'pareja-fad08.firebaseapp.com',
+    projectId: 'pareja-fad08',
+    storageBucket: 'pareja-fad08.firebasestorage.app',
+    messagingSenderId: '597020053919',
+    appId: '1:597020053919:web:f7e01a6426d8cf27d0edaa',
+};
+const DEFAULT_FIREBASE_ROOM = 'camila-sebastian-pareja';
+
 let firebaseDb = null;
 let firebaseDocRef = null;
 let firebaseUnsubscribe = null;
@@ -35,6 +46,13 @@ function obtenerPreferenciasFirebase() {
         roomId = localStorage.getItem(FIREBASE_ROOM_KEY) || '';
     } catch (error) {
         roomId = '';
+    }
+
+    if (!config) {
+        config = clonar(DEFAULT_FIREBASE_CONFIG);
+    }
+    if (!roomId) {
+        roomId = DEFAULT_FIREBASE_ROOM;
     }
 
     return { config, roomId };
