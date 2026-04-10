@@ -121,16 +121,45 @@ async function inicializarFirebaseSync(configInput, roomIdInput) {
             firebaseUnsubscribe();
         }
 
+        let firebaseInicializado = false;
+
         firebaseUnsubscribe = firebaseDocRef.onSnapshot((snapshot) => {
             const remoto = snapshot.exists ? snapshot.data()?.datos : null;
-            if (!remoto) {
+
+            if (!firebaseInicializado) {
+                firebaseInicializado = true;
+                const tieneDataRemota = remoto && Object.values(remoto).some(arr => Array.isArray(arr) && arr.length > 0);
+                const localDatos = obtenerTodosDatos();
+                const tieneDataLocal = Object.values(localDatos).some(arr => Array.isArray(arr) && arr.length > 0);
+
+                if (tieneDataRemota) {
+                    // Firebase tiene datos → tomar como verdad (nuevo dispositivo o datos más recientes)
+                    if (JSON.stringify(remoto) !== JSON.stringify(localDatos)) {
+                        firebaseSincronizandoRemoto = true;
+                        guardarTodosDatos(remoto, { skipRemote: true });
+                        firebaseSincronizandoRemoto = false;
+                        if (typeof renderizarSeccion === 'function') {
+                            const activa = document.querySelector('.section--active')?.id || 'proyectos';
+                            renderizarSeccion(activa);
+                        }
+                    }
+                } else if (tieneDataLocal) {
+                    // Firebase vacío pero local tiene datos → subir local
+                    forzarSyncFirebaseAhora();
+                }
                 return;
             }
+
+            // Sync normal después de la inicialización
+            if (!remoto) return;
 
             const local = obtenerTodosDatos();
             if (JSON.stringify(remoto) === JSON.stringify(local)) {
                 return;
             }
+
+            // Cancelar push pendiente para evitar que suba datos obsoletos
+            clearTimeout(firebasePushTimer);
 
             firebaseSincronizandoRemoto = true;
             guardarTodosDatos(remoto, { skipRemote: true });
@@ -144,7 +173,6 @@ async function inicializarFirebaseSync(configInput, roomIdInput) {
         });
 
         guardarPreferenciasFirebase(config, roomId);
-        await forzarSyncFirebaseAhora();
         return { ok: true };
     } catch (error) {
         console.error('No se pudo iniciar Firebase sync:', error);
